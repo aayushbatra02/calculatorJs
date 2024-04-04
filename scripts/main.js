@@ -10,43 +10,48 @@ let token = [];
 
 for (let i = 0; i < elementsArray.length; i++) {
   elementsArray[i].addEventListener("click", () => {
-    if (elementsArray[i].innerHTML === "=") {
-      doCalculation();
-    } else if (elementsArray[i].innerHTML === "C") {
-      screenText = [];
-      token = [];
-      screen.value = "";
-    } else {
-      if (
-        //for two consecutive operators
-        "+,-,*,/".includes(elementsArray[i].innerHTML) &&
-        "+,-,*,/".includes(screenText[screenText.length - 1])
-      ) {
-        console.log("Eat 5 star and do nothing");
-      } else if (
-        //operator should not be clicked in begining
-        screenText.length === 0 &&
-        "+,*,/,".includes(elementsArray[i].innerHTML)
-      ) {
-        console.log("Eat 5 star and do nothing");
-      } else if (
-        //In beginnig, if . clicked, convert it to 0.
-        screenText.length === 0 &&
-        elementsArray[i].innerHTML === "."
-      ) {
-        screenText.push("0", ".");
-        screen.value = screenText.join("");
-        token = ["0", "."];
-      } else if (token.includes(".") && elementsArray[i].innerHTML === ".") {
-        console.log("Eat 5 star and do nothing");
-      } else {
-        //will run normally
-        if ("+,-,*,/".includes(elementsArray[i].innerHTML)) {
-          token = [];
+    switch (elementsArray[i].innerHTML) {
+      case "=": {
+        doCalculation();
+        break;
+      }
+      case "C": {
+        screenText = [];
+        token = [];
+        screen.value = "";
+        break;
+      }
+      default: {
+        if (
+          //In beginnig, if . clicked, convert it to 0.
+          screenText.length === 0 &&
+          elementsArray[i].innerHTML === "."
+        ) {
+          screenText.push("0", ".");
+          screen.value = screenText.join("");
+          token = ["0", "."];
+        } else if (
+          //for two consecutive operators
+          !(
+            "+,-,*,/".includes(elementsArray[i].innerHTML) &&
+            "+,-,*,/".includes(screenText[screenText.length - 1])
+          ) &&
+          //operator should not be clicked in begining
+          !(
+            screenText.length === 0 &&
+            "+,*,/,".includes(elementsArray[i].innerHTML)
+          ) &&
+          //two dots in one number
+          !(token.includes(".") && elementsArray[i].innerHTML === ".")
+        ) {
+          if ("+,-,*,/".includes(elementsArray[i].innerHTML)) {
+            //clear token on operator click
+            token = [];
+          }
+          token.push(elementsArray[i].innerHTML);
+          screenText.push(elementsArray[i].innerHTML);
+          screen.value = screenText.join("");
         }
-        token.push(elementsArray[i].innerHTML);
-        screenText.push(elementsArray[i].innerHTML);
-        screen.value = screenText.join("");
       }
     }
   });
