@@ -1,114 +1,115 @@
-const screen = document.querySelector(".screen");
+const input = document.querySelector(".input");
 const keys = document.querySelectorAll(".key");
 
-let screenText = [];
-const elementsArray = Array.from(keys);
-screen.value = 0;
+let inputText = [];
+const keysArray = Array.from(keys);
+input.value = 0;
 
 //on click functions on buttons and handle edge cases
-let token = [];
 
-for (let i = 0; i < elementsArray.length; i++) {
-  elementsArray[i].addEventListener("click", () => {
-    switch (elementsArray[i].innerHTML) {
+let number = [];
+
+for (let i = 0; i < keysArray.length; i++) {
+  keysArray[i].addEventListener("click", () => {
+    switch (keysArray[i].innerHTML) {
       case "=": {
-        doCalculation();
+        handleCalculations();
         break;
       }
       case "C": {
-        screenText = [];
-        token = [];
-        screen.value = "";
+        inputText = [];
+        number = [];
+        input.value = "";
         break;
       }
       default: {
         if (
           //In beginnig, if . clicked, convert it to 0.
-          screenText.length === 0 &&
-          elementsArray[i].innerHTML === "."
+          inputText.length === 0 &&
+          keysArray[i].innerHTML === "."
         ) {
-          screenText.push("0", ".");
-          screen.value = screenText.join("");
-          token = ["0", "."];
+          inputText.push("0", ".");
+          input.value = inputText.join("");
+          number = ["0", "."];
         } else if (
           //for two consecutive operators
           !(
-            "+,-,*,/".includes(elementsArray[i].innerHTML) &&
-            "+,-,*,/".includes(screenText[screenText.length - 1])
+            "+,-,*,/".includes(keysArray[i].innerHTML) &&
+            "+,-,*,/".includes(inputText[inputText.length - 1])
           ) &&
           //operator should not be clicked in begining
           !(
-            screenText.length === 0 &&
-            "+,*,/,".includes(elementsArray[i].innerHTML)
+            inputText.length === 0 &&
+            "+,*,/,".includes(keysArray[i].innerHTML)
           ) &&
           //two dots in one number
-          !(token.includes(".") && elementsArray[i].innerHTML === ".")
+          !(number.includes(".") && keysArray[i].innerHTML === ".")
         ) {
-          if ("+,-,*,/".includes(elementsArray[i].innerHTML)) {
-            //clear token on operator click
-            token = [];
+          if ("+,-,*,/".includes(keysArray[i].innerHTML)) {
+            //clear number on operator click
+            number = [];
           }
-          token.push(elementsArray[i].innerHTML);
-          screenText.push(elementsArray[i].innerHTML);
-          screen.value = screenText.join("");
+          number.push(keysArray[i].innerHTML);
+          inputText.push(keysArray[i].innerHTML);
+          input.value = inputText.join("");
         }
       }
     }
   });
 }
 
-screen.addEventListener("keydown", (e) => {
+input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
-    doCalculation();
+    handleCalculations();
   }
 });
 
-const doCalculation = () => {
-  const expString = screen.value;
-  result = calculate(tokenize(expString));
+const handleCalculations = () => {
+  const inputString = input.value;
+  result = calculate(convertStringToArray(inputString));
   if (result?.toString().includes(".")) {
     //convert decimal result numbers upto two decimals
     result = result.toFixed(2);
-    token = ["."];
+    number = ["."];
   }
-  screen.value = result;
-  screenText = [result];
+  input.value = result;
+  inputText = [result];
   if (!result && result !== 0) {
-    screen.value = "NaN";
-    screenText = [];
+    input.value = "NaN";
+    inputText = [];
   }
   if (result === Infinity) {
-    screen.value = "INFINITY";
-    screenText = [];
+    input.value = "INFINITY";
+    inputText = [];
   }
 };
 
-//create tokens form screenText or input
+//create array of numbers and operators form inputText or input
 
-function tokenize(stringExp) {
+function convertStringToArray(inputString) {
   const result = [];
-  let token = "";
-  for (const character of stringExp) {
+  let number = "";
+  for (const character of inputString) {
     if ("*/+-".includes(character)) {
-      if (token === "" && character === "-") {
-        token = "-";
+      if (number === "" && character === "-") {
+        number = "-";
       } else {
-        result.push(parseFloat(token), character);
-        token = "";
+        result.push(parseFloat(number), character);
+        number = "";
       }
     } else {
-      token += character;
+      number += character;
     }
   }
-  if (token !== "") {
-    result.push(parseFloat(token));
+  if (number !== "") {
+    result.push(parseFloat(number));
   }
   return result;
 }
 
 //Perform actual calculation
 
-function calculate(tokens) {
+function calculate(array) {
   const operatorPrecedence = [
     {
       "/": (a, b) => a / b,
@@ -118,26 +119,21 @@ function calculate(tokens) {
   ];
   let operator;
   for (const operators of operatorPrecedence) {
-    const newTokens = [];
-    for (const token of tokens) {
-      if (token in operators) {
-        operator = operators[token];
+    const newarray = [];
+    for (const element of array) {
+      if (element in operators) {
+        operator = operators[element];
       } else if (operator) {
-        newTokens[newTokens.length - 1] = operator(
-          newTokens[newTokens.length - 1],
-          token
+        newarray[newarray.length - 1] = operator(
+          newarray[newarray.length - 1],
+          element
         );
         operator = null;
       } else {
-        newTokens.push(token);
+        newarray.push(element);
       }
     }
-    tokens = newTokens;
+    array = newarray;
   }
-  if (tokens.length > 1) {
-    console.log("Error: unable to resolve calculation");
-    return tokens;
-  } else {
-    return tokens[0];
-  }
+  return array[0]
 }
