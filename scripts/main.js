@@ -49,6 +49,7 @@ for (let i = 0; i < keysArray.length; i++) {
             //clear number on operator click
             number = [];
           }
+          //it will work on normal button click when there is no edge case
           number.push(keysArray[i].innerHTML);
           inputText.push(keysArray[i].innerHTML);
           input.value = inputText.join("");
@@ -68,7 +69,7 @@ const handleCalculations = () => {
   const inputString = input.value;
   result = calculate(convertStringToArray(inputString));
   if (result?.toString().includes(".")) {
-    //convert decimal result numbers upto two decimals
+    //convert result with decimals upto two decimals number
     result = result.toFixed(2);
     number = ["."];
   }
@@ -117,10 +118,12 @@ function calculate(array) {
     { "*": (a, b) => a * b },
     { "+": (a, b) => a + b, "-": (a, b) => a - b },
   ];
+  //this will store operator function
   let operator;
-  for (const operators of operatorPrecedence) {
+  //Now we will go through array of numbers and operators and do division in first loop, then multiplication and so on.... 
+  for (const operators of operatorPrecedence) {   
     const newarray = [];
-    for (const element of array) {
+    for (const element of array) {  
       if (element in operators) {
         operator = operators[element];
       } else if (operator) {
