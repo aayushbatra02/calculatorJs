@@ -34,8 +34,8 @@ for (let i = 0; i < keysArray.length; i++) {
         } else if (
           //for two consecutive operators
           !(
-            "+,-,*,/".includes(keysArray[i].innerHTML) &&
-            "+,-,*,/".includes(inputText[inputText.length - 1])
+            "+,*,/".includes(keysArray[i].innerHTML) &&
+            "+,*,/".includes(inputText[inputText.length - 1])
           ) &&
           //operator should not be clicked in begining
           !(
